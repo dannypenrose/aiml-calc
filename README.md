@@ -2,6 +2,8 @@
 
 Classic AI and machine-learning algorithms, implemented from scratch in pure Python and **worked step by step**: every result comes with the full trace, a second method or independent check where one exists, and the conventions the algorithm used. It follows Russell & Norvig's *Artificial Intelligence: A Modern Approach* (AIMA), with an interactive web UI and an [MCP](https://modelcontextprotocol.io) server so AI assistants can call the same algorithms.
 
+**Try it live:** [dannypenrose.com/aiml-calc](https://dannypenrose.com/aiml-calc), or full screen at [aiml.dannypenrose.com](https://aiml.dannypenrose.com). No install needed; the public site turns off the **▶ Run** button, so run the generated code on your own machine.
+
 | | |
 |---|---|
 | ![A* search on a weighted graph](docs/search.png) | ![Alpha-beta pruning on a game tree](docs/alpha-beta.png) |
@@ -124,17 +126,26 @@ Every function also returns a `markdown` field with the full worked trace.
 
 ### Deploy the web UI
 
-The repo is ready for [Streamlit Community Cloud](https://streamlit.io/cloud), which is free for public repositories:
+The live site, [aiml.dannypenrose.com](https://aiml.dannypenrose.com), runs on a self-hosted Ubuntu server: Streamlit
+on `127.0.0.1:3090` under a hardened systemd unit (`deploy/forge/aiml-calc.service`), Nginx in front
+(`deploy/forge/aiml-calc.nginx.conf`) and a Cloudflare Tunnel to the internet. `deploy/forge-setup.sh` installs or
+updates all of it and is safe to run twice:
 
-1. Push the repo to GitHub.
-2. At [share.streamlit.io](https://share.streamlit.io), sign in with GitHub and choose **Create app**.
-3. Choose this repository, branch `main` and main file `streamlit_app.py`. Pick a subdomain if you like
-   (e.g. `aiml-calc.streamlit.app`).
-4. Under **Advanced settings**, set Python to 3.12, then **Deploy**.
+```bash
+deploy/forge-setup.sh            # plan: checks everything and changes nothing
+deploy/forge-setup.sh --apply    # install or repair, then smoke test
+deploy/forge-setup.sh --update   # pull main, reinstall dependencies, restart
+```
 
-It installs from `requirements.txt` and redeploys whenever you push. `streamlit_app.py` sets `AIML_CALC_PUBLIC=1`,
-which turns off the **▶ Run** button in the code panels on the public site. Set `AIML_CALC_PUBLIC=0` to turn it back
-on, but only on a server that only you use.
+Nginx lets only dannypenrose.com frame the app (`frame-ancestors`), where it is embedded in the site's layout.
+
+The repo also works on [Streamlit Community Cloud](https://streamlit.io/cloud), which is free for public
+repositories: at [share.streamlit.io](https://share.streamlit.io) choose **Create app**, this repository, branch
+`main` and main file `streamlit_app.py`, with Python 3.12 under **Advanced settings**.
+
+Either way the public site sets `AIML_CALC_PUBLIC=1` (`streamlit_app.py` and the systemd unit), which turns off the
+**▶ Run** button in the code panels, because running visitors' code on a shared server is not safe. Set
+`AIML_CALC_PUBLIC=0` to turn it back on, but only on a server that only you use.
 
 ## Use it from Claude (MCP)
 
