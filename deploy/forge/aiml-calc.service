@@ -1,0 +1,55 @@
+# aiml-calc public web UI (https://aiml.dannypenrose.com), run in the forge machine.
+# Installed by deploy/forge-setup.sh as /etc/systemd/system/aiml-calc.service.
+#
+# Streamlit binds to loopback only; Nginx (aiml.dannypenrose.com) proxies to it and the
+# home-public Cloudflare tunnel reaches Nginx. AIML_CALC_PUBLIC=1 turns off the code runner,
+# because running visitors' code on a shared server is not safe.
+
+[Unit]
+Description=aiml-calc web UI (Streamlit)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=aiml
+Group=aiml
+WorkingDirectory=/var/www/aiml-calc/app
+Environment=AIML_CALC_PUBLIC=1
+Environment=HOME=/var/www/aiml-calc/home
+Environment=PYTHONUNBUFFERED=1
+Environment=STREAMLIT_BROWSER_GATHER_USAGE_STATS=false
+ExecStart=/var/www/aiml-calc/venv/bin/python -m streamlit run streamlit_app.py \
+    --server.address 127.0.0.1 \
+    --server.port 3090 \
+    --server.headless true \
+    --server.fileWatcherType none \
+    --server.runOnSave false \
+    --server.maxUploadSize 1 \
+    --client.toolbarMode minimal \
+    --theme.base light \
+    --theme.primaryColor "#2563EB"
+Restart=always
+RestartSec=10
+TimeoutStopSec=20
+
+# Hardening: the app needs to read its code and venv and write only its own home folder.
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+ReadWritePaths=/var/www/aiml-calc/home
+CapabilityBoundingSet=
+MemoryMax=1G
+CPUQuota=150%
+TasksMax=128
+
+[Install]
+WantedBy=multi-user.target
