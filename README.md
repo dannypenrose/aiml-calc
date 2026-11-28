@@ -2,7 +2,7 @@
 
 Classic AI and machine-learning algorithms, implemented from scratch in pure Python and **worked step by step**: every result comes with the full trace, a second method or independent check where one exists, and the conventions the algorithm used. It follows Russell & Norvig's *Artificial Intelligence: A Modern Approach* (AIMA), with an interactive web UI and an [MCP](https://modelcontextprotocol.io) server so AI assistants can call the same algorithms.
 
-**Try it live:** [dannypenrose.com/aiml-calc](https://dannypenrose.com/aiml-calc), or full screen at [aiml.dannypenrose.com](https://aiml.dannypenrose.com). No install needed; the public site turns off the **▶ Run** button, so run the generated code on your own machine.
+**Try it live:** [aiml.dannypenrose.com](https://aiml.dannypenrose.com). No install needed; the public site turns off the **▶ Run** button, so run the generated code on your own machine.
 
 | | |
 |---|---|
@@ -136,8 +136,6 @@ deploy/forge-setup.sh            # plan: checks everything and changes nothing
 deploy/forge-setup.sh --apply    # install or repair, then smoke test
 deploy/forge-setup.sh --update   # pull main, reinstall dependencies, restart
 ```
-
-Nginx lets only dannypenrose.com frame the app (`frame-ancestors`), where it is embedded in the site's layout.
 
 The repo also works on [Streamlit Community Cloud](https://streamlit.io/cloud), which is free for public
 repositories: at [share.streamlit.io](https://share.streamlit.io) choose **Create app**, this repository, branch
